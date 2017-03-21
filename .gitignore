@@ -86,3 +86,5 @@ Desktop.ini
 
 # Certificate file extensions
 *.pfx
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite

@@ -293,7 +293,7 @@ namespace IdleMaster
 
             // Reset the timer
             //TimeLeft = CurrentBadge.RemainingCard == 1 ? 300 : 900;
-            if (CurrentBadge.FastMode)
+            if (Settings.Default.fastModeEnable && CurrentBadge.FastMode)
             {
                 if (PreviousBadge != null)
                 {
@@ -908,7 +908,7 @@ namespace IdleMaster
                     }
                     else
                     {
-                        if ( CurrentBadge.FastMode)
+                        if (Settings.Default.fastModeEnable && CurrentBadge.FastMode)
                         {
                             //現在のゲームとカードドロップ数を記録しておく
                             //await CurrentBadge.CanCardDrops();
@@ -954,6 +954,10 @@ namespace IdleMaster
             {
                 TimeLeft = TimeLeft - 1;
                 lblTimer.Text = TimeSpan.FromSeconds(TimeLeft).ToString(@"mm\:ss");
+                if (Settings.Default.fastModeEnable)
+                {
+                    lblTimer.Text += CurrentBadge.FastMode ? "(F)" : "(N)";
+                }
             }
         }
 

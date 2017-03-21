@@ -59,6 +59,7 @@ namespace IdleMaster
         Settings.Default.minToTray = chkMinToTray.Checked;
         Settings.Default.ignoreclient = chkIgnoreClientStatus.Checked;
         Settings.Default.showUsername = chkShowUsername.Checked;
+        Settings.Default.fastModeEnable = chkEnableFastMode.Checked;
         Settings.Default.Save();
         Close();
     }
@@ -153,9 +154,14 @@ namespace IdleMaster
         {
         chkShowUsername.Checked = true;
         }
-    }
 
-    private void btnAdvanced_Click(object sender, EventArgs e)
+        if (!Settings.Default.fastModeEnable)
+        {
+            chkEnableFastMode.Checked = false;
+        }
+        }
+
+        private void btnAdvanced_Click(object sender, EventArgs e)
     {
       var frm = new frmSettingsAdvanced();
       frm.ShowDialog();

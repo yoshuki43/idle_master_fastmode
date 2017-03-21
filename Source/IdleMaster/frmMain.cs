@@ -38,7 +38,9 @@ namespace IdleMaster
         public int CardsRemaining { get { return CanIdleBadges.Sum(b => b.RemainingCard); } }
         public int GamesRemaining { get { return CanIdleBadges.Count(); } }
         public Badge CurrentBadge;
-
+        public Badge PreviousBadge;
+        public int PreviousCardsRemaining;
+        
         internal void UpdateStateInfo()
         {
             // Update totals
@@ -290,7 +292,21 @@ namespace IdleMaster
             tmrCardDropCheck.Enabled = true;
 
             // Reset the timer
-            TimeLeft = CurrentBadge.RemainingCard == 1 ? 300 : 900;
+            //TimeLeft = CurrentBadge.RemainingCard == 1 ? 300 : 900;
+            if (CurrentBadge.FastMode)
+            {
+                if (PreviousBadge != null)
+                {
+                    TimeLeft = 15;
+                }
+                else
+                {
+                    TimeLeft = 60;
+                }
+            } else
+            {
+                TimeLeft = CurrentBadge.RemainingCard == 1 ? 300 : 900;
+            }
 
             // Set the correct buttons on the form for pause / resume
             btnResume.Visible = false;
@@ -852,7 +868,71 @@ namespace IdleMaster
                 if (CurrentBadge != null)
                 {
                     CurrentBadge.Idle();
-                    await CheckCardDrops(CurrentBadge);
+
+                    if (PreviousBadge != null)
+                    {
+                        await PreviousBadge.CanCardDrops();
+                        if (PreviousCardsRemaining != PreviousBadge.RemainingCard)
+                        {
+                            //前のゲームのカードがドロップしたようなので、ファストモード成功。
+                            //あと４５秒くらいまって次のカードへ。
+                            TimeLeft = 45;
+
+                            //前のゲームにカードが残っているようなら、ファストモードにしておく。
+                            if (PreviousBadge.RemainingCard > 0)
+                            {
+                                PreviousBadge.FastMode = true;
+                            }
+                        }
+                        else
+                        {
+                            //ファストモード失敗。
+
+                            //XX 今のゲームを通常モードに。
+                            //CurrentBadge.FastMode = false;
+                            //TimeLeft = CurrentBadge.RemainingCard == 1 ? 300 : 900;
+
+                            //前のゲームを一番先頭に
+                            AllBadges.RemoveAll(b => Equals(b, PreviousBadge));
+                            AllBadges.Insert(0, PreviousBadge);
+                            PreviousBadge.FastMode = false;
+
+                            //前のゲームを通常モードでやり直す
+                            //(今のゲームはそのまま。)
+                            NextIdle();
+                        }
+
+
+                        //前のゲームの処理は終わり
+                        PreviousBadge = null;
+                    }
+                    else
+                    {
+                        if ( CurrentBadge.FastMode)
+                        {
+                            //現在のゲームとカードドロップ数を記録しておく
+                            //await CurrentBadge.CanCardDrops();
+                            PreviousCardsRemaining = CurrentBadge.RemainingCard;
+                            PreviousBadge = CurrentBadge;
+
+                            //現在のゲームを最後尾へ
+                            AllBadges.RemoveAll(b => Equals(b, CurrentBadge));
+                            AllBadges.Add(CurrentBadge);
+
+                            //次のゲームへ
+                            NextIdle();
+                        }
+                        else
+                        {
+                            //通常モード
+                            await CheckCardDrops(CurrentBadge);
+                        }
+
+                    }
+
+                    //original code
+                    //CurrentBadge.Idle();
+                    //await CheckCardDrops(CurrentBadge);
                 }
 
                 var isMultipleIdle = CanIdleBadges.Any(b => !Equals(b, CurrentBadge) && b.InIdle);

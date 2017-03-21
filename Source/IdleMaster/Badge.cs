@@ -26,6 +26,7 @@ namespace IdleMaster
 
         public double HoursPlayed { get; set; }
 
+        public bool FastMode { get; set; }
 
         private Process idleProcess;
 
@@ -102,6 +103,7 @@ namespace IdleMaster
         {
             StringId = id;
             Name = name;
+            FastMode = true;
             UpdateStats(remaining, hours);
         }
 

@@ -108,10 +108,10 @@ namespace IdleMaster
         {
             foreach (var badge in CanIdleBadges.Where(b => !Equals(b, CurrentBadge)))
             {
-                if (badge.HoursPlayed >= 2 && badge.InIdle)
+                if (badge.HoursPlayed >= badge.MinPlayTime && badge.InIdle)
                     badge.StopIdle();
 
-                if (badge.HoursPlayed < 2 && CanIdleBadges.Count(b => b.InIdle) < 30)
+                if (badge.HoursPlayed < badge.MinPlayTime && CanIdleBadges.Count(b => b.InIdle) < 30)
                     badge.Idle();
             }
 
@@ -187,7 +187,10 @@ namespace IdleMaster
             {
 
             }
-            
+
+            //clear current badge
+            CurrentBadge = null;
+
             // Check if user is authenticated and if any badge left to idle
             // There should be check for IsCookieReady, but property is set in timer tick, so it could take some time to be set.
             if (string.IsNullOrWhiteSpace(Settings.Default.sessionid) || !IsSteamReady)
@@ -213,7 +216,7 @@ namespace IdleMaster
                     {
                         if (Settings.Default.OneThenMany)
                         {
-                            var multi = CanIdleBadges.Where(b => b.HoursPlayed >= 2);
+                            var multi = CanIdleBadges.Where(b => b.HoursPlayed >= b.MinPlayTime);
                             if (multi.Count() >= 1)
                             {
                                 StartSoloIdle(multi.First());
@@ -225,7 +228,7 @@ namespace IdleMaster
                         }
                         else
                         {
-                            var multi = CanIdleBadges.Where(b => b.HoursPlayed < 2);
+                            var multi = CanIdleBadges.Where(b => b.HoursPlayed < b.MinPlayTime);
                             if (multi.Count() >= 2)
                             {
                                 StartMultipleIdle();
@@ -297,11 +300,11 @@ namespace IdleMaster
             {
                 if (PreviousBadge != null)
                 {
-                    TimeLeft = 15;
+                    TimeLeft = 10;
                 }
                 else
                 {
-                    TimeLeft = 60;
+                    TimeLeft = 30;
                 }
             } else
             {
@@ -767,7 +770,8 @@ namespace IdleMaster
 
         private void lblGameName_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("http://store.steampowered.com/app/" + CurrentBadge.AppId);
+            if (CurrentBadge != null)
+               Process.Start("http://store.steampowered.com/app/" + CurrentBadge.AppId);
         }
 
         private void lnkResetCookies_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -865,6 +869,8 @@ namespace IdleMaster
             if (TimeLeft <= 0)
             {
                 tmrCardDropCheck.Enabled = false;
+
+                // solo mode
                 if (CurrentBadge != null)
                 {
                     CurrentBadge.Idle();
@@ -875,31 +881,45 @@ namespace IdleMaster
                         if (PreviousCardsRemaining != PreviousBadge.RemainingCard)
                         {
                             //前のゲームのカードがドロップしたようなので、ファストモード成功。
-                            //あと４５秒くらいまって次のカードへ。
-                            TimeLeft = 45;
+                            //あと20秒くらいまって次のカードへ。
+                            TimeLeft = 20;
 
                             //前のゲームにカードが残っているようなら、ファストモードにしておく。
                             if (PreviousBadge.RemainingCard > 0)
                             {
                                 PreviousBadge.FastMode = true;
+
+                                //次も同じゲームをIdleする
+                                AllBadges.RemoveAll(b => Equals(b, PreviousBadge));
+                                AllBadges.Insert(0, PreviousBadge);
                             }
                         }
                         else
                         {
                             //ファストモード失敗。
 
-                            //XX 今のゲームを通常モードに。
-                            //CurrentBadge.FastMode = false;
-                            //TimeLeft = CurrentBadge.RemainingCard == 1 ? 300 : 900;
+                            //最低プレイ時間を１時間延ばす
+                            //ただしプレイ時間が５時間以上のものは通常モードにする。
+                            //(無限にIdleするのを防ぐため。)
+                            if (PreviousBadge.HoursPlayed <= 5)
+                            {
+                                PreviousBadge.MinPlayTime += 1;
 
-                            //前のゲームを一番先頭に
-                            AllBadges.RemoveAll(b => Equals(b, PreviousBadge));
-                            AllBadges.Insert(0, PreviousBadge);
-                            PreviousBadge.FastMode = false;
+                                //あと20秒くらいまって次のカードへ。
+                                TimeLeft = 20;
+                            }
+                            else
+                            {
+                                PreviousBadge.FastMode = false;
 
-                            //前のゲームを通常モードでやり直す
-                            //(今のゲームはそのまま。)
-                            NextIdle();
+                                //前のゲームを一番先頭に
+                                AllBadges.RemoveAll(b => Equals(b, PreviousBadge));
+                                AllBadges.Insert(0, PreviousBadge);
+
+                                //次のゲームへ。
+                                //(前のゲームが5時間以上プレイしていれば、通常モードで前のゲームをIdleする。)
+                                NextIdle();
+                            }
                         }
 
 
@@ -911,7 +931,6 @@ namespace IdleMaster
                         if (Settings.Default.fastModeEnable && CurrentBadge.FastMode)
                         {
                             //現在のゲームとカードドロップ数を記録しておく
-                            //await CurrentBadge.CanCardDrops();
                             PreviousCardsRemaining = CurrentBadge.RemainingCard;
                             PreviousBadge = CurrentBadge;
 
@@ -929,10 +948,6 @@ namespace IdleMaster
                         }
 
                     }
-
-                    //original code
-                    //CurrentBadge.Idle();
-                    //await CheckCardDrops(CurrentBadge);
                 }
 
                 var isMultipleIdle = CanIdleBadges.Any(b => !Equals(b, CurrentBadge) && b.InIdle);
@@ -941,7 +956,7 @@ namespace IdleMaster
                     await LoadBadgesAsync();
                     UpdateIdleProcesses();
 
-                    isMultipleIdle = CanIdleBadges.Any(b => b.HoursPlayed < 2 && b.InIdle);
+                    isMultipleIdle = CanIdleBadges.Any(b => b.HoursPlayed < b.MinPlayTime && b.InIdle);
                     if (isMultipleIdle)
                         TimeLeft = 360;
                 }
@@ -954,7 +969,7 @@ namespace IdleMaster
             {
                 TimeLeft = TimeLeft - 1;
                 lblTimer.Text = TimeSpan.FromSeconds(TimeLeft).ToString(@"mm\:ss");
-                if (Settings.Default.fastModeEnable)
+                if (Settings.Default.fastModeEnable && CurrentBadge != null)
                 {
                     lblTimer.Text += CurrentBadge.FastMode ? "(F)" : "(N)";
                 }
@@ -1080,16 +1095,22 @@ namespace IdleMaster
             var frm = new frmBlacklist();
             frm.ShowDialog();
 
-            if (Settings.Default.blacklist.Cast<string>().Any(appid => appid == CurrentBadge.StringId))
-                btnSkip.PerformClick();
+            if (CurrentBadge != null)
+            {
+                if (Settings.Default.blacklist.Cast<string>().Any(appid => appid == CurrentBadge.StringId))
+                    btnSkip.PerformClick();
+            }
         }
 
         private void blacklistCurrentGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Settings.Default.blacklist.Add(CurrentBadge.StringId);
-            Settings.Default.Save();
+            if (CurrentBadge != null)
+            {
+                Settings.Default.blacklist.Add(CurrentBadge.StringId);
+                Settings.Default.Save();
 
-            btnSkip.PerformClick();
+                btnSkip.PerformClick();
+            }
         }
 
         private void tmrStartNext_Tick(object sender, EventArgs e)

@@ -1,3 +1,5 @@
+Please see "fastmode" branch.
+
 Idle Master
 ===========
 

@@ -25,6 +25,7 @@ namespace IdleMaster
         public int RemainingCard { get; set; }
 
         public double HoursPlayed { get; set; }
+        public double MinPlayTime { get; set; }
 
         public bool FastMode { get; set; }
 
@@ -104,6 +105,7 @@ namespace IdleMaster
             StringId = id;
             Name = name;
             FastMode = true;
+            MinPlayTime = 2; // default = 2 hours
             UpdateStats(remaining, hours);
         }
 

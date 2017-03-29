@@ -304,7 +304,7 @@ namespace IdleMaster
                 }
                 else
                 {
-                    TimeLeft = 30;
+                    TimeLeft = 20;
                 }
             } else
             {
@@ -881,8 +881,8 @@ namespace IdleMaster
                         if (PreviousCardsRemaining != PreviousBadge.RemainingCard)
                         {
                             //前のゲームのカードがドロップしたようなので、ファストモード成功。
-                            //あと20秒くらいまって次のカードへ。
-                            TimeLeft = 20;
+                            //あと10秒くらいまって次のカードへ。
+                            TimeLeft = 10;
 
                             //前のゲームにカードが残っているようなら、ファストモードにしておく。
                             if (PreviousBadge.RemainingCard > 0)
@@ -898,15 +898,16 @@ namespace IdleMaster
                         {
                             //ファストモード失敗。
 
-                            //最低プレイ時間を１時間延ばす
+                            //最低プレイ時間を30min間延ばす
                             //ただしプレイ時間が５時間以上のものは通常モードにする。
                             //(無限にIdleするのを防ぐため。)
                             if (PreviousBadge.HoursPlayed <= 5)
                             {
-                                PreviousBadge.MinPlayTime += 1;
+                                while (PreviousBadge.HoursPlayed > PreviousBadge.MinPlayTime)
+                                    PreviousBadge.MinPlayTime += 0.5;
 
                                 //あと20秒くらいまって次のカードへ。
-                                TimeLeft = 20;
+                                TimeLeft = 10;
                             }
                             else
                             {
@@ -921,7 +922,6 @@ namespace IdleMaster
                                 NextIdle();
                             }
                         }
-
 
                         //前のゲームの処理は終わり
                         PreviousBadge = null;

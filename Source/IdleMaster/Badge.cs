@@ -106,6 +106,10 @@ namespace IdleMaster
             Name = name;
             FastMode = true;
             MinPlayTime = 2; // default = 2 hours
+            if (Settings.Default.initialIdleMin > 0)
+            {
+                MinPlayTime = (double)Settings.Default.initialIdleMin / 60.0;
+            }
             UpdateStats(remaining, hours);
         }
 

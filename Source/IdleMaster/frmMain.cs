@@ -111,7 +111,7 @@ namespace IdleMaster
                 if (badge.HoursPlayed >= badge.MinPlayTime && badge.InIdle)
                     badge.StopIdle();
 
-                if (badge.HoursPlayed < badge.MinPlayTime && CanIdleBadges.Count(b => b.InIdle) < 30)
+                if (badge.HoursPlayed < badge.MinPlayTime && CanIdleBadges.Count(b => b.InIdle) < Settings.Default.maxSimultaneousNum)
                     badge.Idle();
             }
 
@@ -889,9 +889,26 @@ namespace IdleMaster
                             {
                                 PreviousBadge.FastMode = true;
 
-                                //次も同じゲームをIdleする
-                                AllBadges.RemoveAll(b => Equals(b, PreviousBadge));
-                                AllBadges.Insert(0, PreviousBadge);
+                                if (Settings.Default.checkNoDrop)
+                                {
+                                    //次も同じゲームをIdleする
+                                    AllBadges.RemoveAll(b => Equals(b, PreviousBadge));
+                                    AllBadges.Insert(0, PreviousBadge);
+                                }
+                                else
+                                {
+                                    //追加Idle
+                                    if (PreviousBadge.HoursPlayed <= 10)
+                                    {
+                                        while (PreviousBadge.HoursPlayed > PreviousBadge.MinPlayTime)
+                                            PreviousBadge.MinPlayTime += 0.5;
+                                    }
+                                    else
+                                    {
+                                        //Idle時間が10時間を越えていたならFastModeをやめる。
+                                        PreviousBadge.FastMode = false;
+                                    }
+                                }
                             }
                         }
                         else
@@ -899,9 +916,9 @@ namespace IdleMaster
                             //ファストモード失敗。
 
                             //最低プレイ時間を30min間延ばす
-                            //ただしプレイ時間が５時間以上のものは通常モードにする。
+                            //ただしプレイ時間が10時間以上のものは通常モードにする。
                             //(無限にIdleするのを防ぐため。)
-                            if (PreviousBadge.HoursPlayed <= 5)
+                            if (PreviousBadge.HoursPlayed <= 10)
                             {
                                 while (PreviousBadge.HoursPlayed > PreviousBadge.MinPlayTime)
                                     PreviousBadge.MinPlayTime += 0.5;
@@ -913,12 +930,7 @@ namespace IdleMaster
                             {
                                 PreviousBadge.FastMode = false;
 
-                                //前のゲームを一番先頭に
-                                AllBadges.RemoveAll(b => Equals(b, PreviousBadge));
-                                AllBadges.Insert(0, PreviousBadge);
-
                                 //次のゲームへ。
-                                //(前のゲームが5時間以上プレイしていれば、通常モードで前のゲームをIdleする。)
                                 NextIdle();
                             }
                         }

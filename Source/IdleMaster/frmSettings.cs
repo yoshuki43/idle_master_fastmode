@@ -60,7 +60,16 @@ namespace IdleMaster
         Settings.Default.ignoreclient = chkIgnoreClientStatus.Checked;
         Settings.Default.showUsername = chkShowUsername.Checked;
         Settings.Default.fastModeEnable = chkEnableFastMode.Checked;
-        Settings.Default.Save();
+            Settings.Default.checkNoDrop = chkCheckNoDrop.Checked;
+            if (txtInitialIdleMin.Text != "")
+            {
+                Settings.Default.initialIdleMin = Int32.Parse(txtInitialIdleMin.Text);
+            }
+            if (txtMaxSimultaneousNum.Text != "")
+            {
+                Settings.Default.maxSimultaneousNum = Int32.Parse(txtMaxSimultaneousNum.Text);
+            }
+            Settings.Default.Save();
         Close();
     }
 
@@ -159,6 +168,15 @@ namespace IdleMaster
         {
             chkEnableFastMode.Checked = false;
         }
+
+        if (!Settings.Default.checkNoDrop)
+        {
+            chkCheckNoDrop.Checked = false;
+        }
+
+        txtMaxSimultaneousNum.Text = Settings.Default.maxSimultaneousNum.ToString();
+        txtInitialIdleMin.Text = Settings.Default.initialIdleMin.ToString();
+
         }
 
         private void btnAdvanced_Click(object sender, EventArgs e)
@@ -166,5 +184,21 @@ namespace IdleMaster
       var frm = new frmSettingsAdvanced();
       frm.ShowDialog();
     }
-  }
+
+        private void txtMaxSimultaneousNum_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar < '0' || '9' < e.KeyChar)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtInitialIdleMin_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar < '0' || '9' < e.KeyChar)
+            {
+                e.Handled = true;
+            }
+        }
+    }
 }

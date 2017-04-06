@@ -49,10 +49,15 @@ namespace IdleMaster
             this.ttHints = new System.Windows.Forms.ToolTip(this.components);
             this.btnAdvanced = new System.Windows.Forms.Button();
             this.grpIdlingQuantity = new System.Windows.Forms.GroupBox();
+            this.chkEnableFastMode = new System.Windows.Forms.CheckBox();
             this.radOneThenMany = new System.Windows.Forms.RadioButton();
             this.radManyThenOne = new System.Windows.Forms.RadioButton();
             this.radOneGameOnly = new System.Windows.Forms.RadioButton();
-            this.chkEnableFastMode = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.chkCheckNoDrop = new System.Windows.Forms.CheckBox();
+            this.txtMaxSimultaneousNum = new System.Windows.Forms.TextBox();
+            this.txtInitialIdleMin = new System.Windows.Forms.TextBox();
             this.grpGeneral.SuspendLayout();
             this.grpPriority.SuspendLayout();
             this.grpIdlingQuantity.SuspendLayout();
@@ -159,7 +164,7 @@ namespace IdleMaster
             this.grpPriority.Controls.Add(this.radIdleLeastDrops);
             this.grpPriority.Controls.Add(this.radIdleMostDrops);
             this.grpPriority.Controls.Add(this.radIdleDefault);
-            this.grpPriority.Location = new System.Drawing.Point(13, 210);
+            this.grpPriority.Location = new System.Drawing.Point(13, 281);
             this.grpPriority.Name = "grpPriority";
             this.grpPriority.Size = new System.Drawing.Size(392, 85);
             this.grpPriority.TabIndex = 1;
@@ -217,7 +222,7 @@ namespace IdleMaster
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(330, 320);
+            this.btnCancel.Location = new System.Drawing.Point(330, 384);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 21);
             this.btnCancel.TabIndex = 2;
@@ -228,7 +233,7 @@ namespace IdleMaster
             // btnOK
             // 
             this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOK.Location = new System.Drawing.Point(249, 320);
+            this.btnOK.Location = new System.Drawing.Point(249, 384);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 21);
             this.btnOK.TabIndex = 3;
@@ -240,7 +245,7 @@ namespace IdleMaster
             // 
             this.btnAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnAdvanced.Image = global::IdleMaster.Properties.Resources.imgLock;
-            this.btnAdvanced.Location = new System.Drawing.Point(12, 320);
+            this.btnAdvanced.Location = new System.Drawing.Point(12, 384);
             this.btnAdvanced.Name = "btnAdvanced";
             this.btnAdvanced.Size = new System.Drawing.Size(25, 21);
             this.btnAdvanced.TabIndex = 4;
@@ -252,6 +257,11 @@ namespace IdleMaster
             // 
             this.grpIdlingQuantity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpIdlingQuantity.Controls.Add(this.txtInitialIdleMin);
+            this.grpIdlingQuantity.Controls.Add(this.txtMaxSimultaneousNum);
+            this.grpIdlingQuantity.Controls.Add(this.chkCheckNoDrop);
+            this.grpIdlingQuantity.Controls.Add(this.label2);
+            this.grpIdlingQuantity.Controls.Add(this.label1);
             this.grpIdlingQuantity.Controls.Add(this.chkEnableFastMode);
             this.grpIdlingQuantity.Controls.Add(this.radOneThenMany);
             this.grpIdlingQuantity.Controls.Add(this.radManyThenOne);
@@ -260,10 +270,23 @@ namespace IdleMaster
             this.grpIdlingQuantity.Margin = new System.Windows.Forms.Padding(2);
             this.grpIdlingQuantity.Name = "grpIdlingQuantity";
             this.grpIdlingQuantity.Padding = new System.Windows.Forms.Padding(2);
-            this.grpIdlingQuantity.Size = new System.Drawing.Size(392, 91);
+            this.grpIdlingQuantity.Size = new System.Drawing.Size(392, 162);
             this.grpIdlingQuantity.TabIndex = 5;
             this.grpIdlingQuantity.TabStop = false;
             this.grpIdlingQuantity.Text = "Idling Behavior";
+            // 
+            // chkEnableFastMode
+            // 
+            this.chkEnableFastMode.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkEnableFastMode.Checked = true;
+            this.chkEnableFastMode.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkEnableFastMode.Location = new System.Drawing.Point(7, 70);
+            this.chkEnableFastMode.Name = "chkEnableFastMode";
+            this.chkEnableFastMode.Size = new System.Drawing.Size(378, 16);
+            this.chkEnableFastMode.TabIndex = 5;
+            this.chkEnableFastMode.Text = "Enable FastMode";
+            this.chkEnableFastMode.UseVisualStyleBackColor = true;
             // 
             // radOneThenMany
             // 
@@ -301,18 +324,53 @@ namespace IdleMaster
             this.radOneGameOnly.Text = "Idle each game individually";
             this.radOneGameOnly.UseVisualStyleBackColor = true;
             // 
-            // chkEnableFastMode
+            // label1
             // 
-            this.chkEnableFastMode.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(24, 113);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(128, 12);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Max simultaneous Idling";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(24, 137);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(114, 12);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Initial Idle Time (min)";
+            // 
+            // chkCheckNoDrop
+            // 
+            this.chkCheckNoDrop.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkEnableFastMode.Checked = true;
-            this.chkEnableFastMode.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkEnableFastMode.Location = new System.Drawing.Point(7, 70);
-            this.chkEnableFastMode.Name = "chkEnableFastMode";
-            this.chkEnableFastMode.Size = new System.Drawing.Size(378, 16);
-            this.chkEnableFastMode.TabIndex = 5;
-            this.chkEnableFastMode.Text = "Enable FastMode";
-            this.chkEnableFastMode.UseVisualStyleBackColor = true;
+            this.chkCheckNoDrop.Checked = true;
+            this.chkCheckNoDrop.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkCheckNoDrop.Location = new System.Drawing.Point(7, 89);
+            this.chkCheckNoDrop.Name = "chkCheckNoDrop";
+            this.chkCheckNoDrop.Size = new System.Drawing.Size(378, 16);
+            this.chkCheckNoDrop.TabIndex = 9;
+            this.chkCheckNoDrop.Text = "Check no more drop after a drop";
+            this.chkCheckNoDrop.UseVisualStyleBackColor = true;
+            // 
+            // txtMaxSimultaneousNum
+            // 
+            this.txtMaxSimultaneousNum.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.txtMaxSimultaneousNum.Location = new System.Drawing.Point(158, 110);
+            this.txtMaxSimultaneousNum.Name = "txtMaxSimultaneousNum";
+            this.txtMaxSimultaneousNum.Size = new System.Drawing.Size(58, 19);
+            this.txtMaxSimultaneousNum.TabIndex = 10;
+            this.txtMaxSimultaneousNum.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtMaxSimultaneousNum_KeyPress);
+            // 
+            // txtInitialIdleMin
+            // 
+            this.txtInitialIdleMin.Location = new System.Drawing.Point(158, 135);
+            this.txtInitialIdleMin.Name = "txtInitialIdleMin";
+            this.txtInitialIdleMin.Size = new System.Drawing.Size(58, 19);
+            this.txtInitialIdleMin.TabIndex = 11;
+            this.txtInitialIdleMin.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtInitialIdleMin_KeyPress);
             // 
             // frmSettings
             // 
@@ -320,7 +378,7 @@ namespace IdleMaster
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(417, 352);
+            this.ClientSize = new System.Drawing.Size(417, 416);
             this.Controls.Add(this.grpIdlingQuantity);
             this.Controls.Add(this.btnAdvanced);
             this.Controls.Add(this.btnOK);
@@ -365,5 +423,10 @@ namespace IdleMaster
     private Label lblLanguage;
     private RadioButton radOneThenMany;
         private CheckBox chkEnableFastMode;
+        private TextBox txtInitialIdleMin;
+        private TextBox txtMaxSimultaneousNum;
+        private CheckBox chkCheckNoDrop;
+        private Label label2;
+        private Label label1;
     }
 }

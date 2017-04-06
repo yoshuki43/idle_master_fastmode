@@ -240,5 +240,41 @@ namespace IdleMaster.Properties {
                 this["fastModeEnable"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int maxSimultaneousNum {
+            get {
+                return ((int)(this["maxSimultaneousNum"]));
+            }
+            set {
+                this["maxSimultaneousNum"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool checkNoDrop {
+            get {
+                return ((bool)(this["checkNoDrop"]));
+            }
+            set {
+                this["checkNoDrop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("120")]
+        public int initialIdleMin {
+            get {
+                return ((int)(this["initialIdleMin"]));
+            }
+            set {
+                this["initialIdleMin"] = value;
+            }
+        }
     }
 }

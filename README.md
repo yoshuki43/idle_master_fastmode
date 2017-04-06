@@ -1,4 +1,4 @@
-Please see "fastmode" branch.
+Fast Mode: Quick card Drop using Skip Button method.
 
 Idle Master
 ===========

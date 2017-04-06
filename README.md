@@ -1,5 +1,7 @@
 Fast Mode: Quick card Drop using Skip Button method.
 
+[Download](https://github.com/yoshuki43/idle_master_fastmode/releases/tag/v1.4.1.1)
+
 Idle Master
 ===========
 
